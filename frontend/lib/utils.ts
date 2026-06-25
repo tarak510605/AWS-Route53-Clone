@@ -44,11 +44,24 @@ export function formatTTL(seconds: number): string {
 
 export function getApiError(error: unknown): string {
   if (error && typeof error === "object" && "response" in error) {
-    const resp = (error as { response?: { data?: { detail?: string | unknown[] } } }).response;
-    if (resp?.data?.detail) {
-      if (typeof resp.data.detail === "string") return resp.data.detail;
-      if (Array.isArray(resp.data.detail)) {
-        return resp.data.detail.map((e: { msg?: string }) => e.msg || String(e)).join(", ");
+    const resp = (error as { response?: { data?: { detail?: unknown } } }).response;
+    if (resp?.data?.detail !== undefined && resp.data.detail !== null) {
+      const detail = resp.data.detail;
+      if (typeof detail === "string") return detail;
+      if (Array.isArray(detail)) {
+        return detail
+          .map((item) => {
+            if (
+              typeof item === "object" &&
+              item !== null &&
+              "msg" in item &&
+              typeof (item as Record<string, unknown>).msg === "string"
+            ) {
+              return (item as Record<string, unknown>).msg as string;
+            }
+            return String(item);
+          })
+          .join(", ");
       }
     }
   }
