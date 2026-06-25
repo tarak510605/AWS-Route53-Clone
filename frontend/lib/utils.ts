@@ -44,7 +44,7 @@ export function formatTTL(seconds: number): string {
 
 export function getApiError(error: unknown): string {
   if (error && typeof error === "object" && "response" in error) {
-    const resp = (error as { response?: { data?: { detail?: string } } }).response;
+    const resp = (error as { response?: { data?: { detail?: string | unknown[] } } }).response;
     if (resp?.data?.detail) {
       if (typeof resp.data.detail === "string") return resp.data.detail;
       if (Array.isArray(resp.data.detail)) {
